@@ -8,6 +8,36 @@ import java.util.stream.IntStream;
 
 public class MatrixUtil {
 
+    public static int[][] concurrentMultiplyMaxple(int[][] matrixA, int[][] matrixB, ExecutorService executor) throws InterruptedException, ExecutionException {
+        final int matrixSize = matrixA.length;
+        final int[][] matrixC = new int[matrixSize][matrixSize];
+
+        List<Callable<Object>> tasks = new ArrayList<>();
+
+        final int pageSize = matrixSize / MainMatrix.THREAD_NUMBER;
+
+        for (int n = 0; n < matrixSize; n += pageSize) {
+            int finalN = n;
+            tasks.add(() -> {
+                for (int k = 0; k < matrixSize; k++) {
+                    try {
+                        for (int row = finalN; row < finalN + pageSize; row++) {
+                            for (int col = 0; col < matrixSize; col++) {
+                                matrixC[row][col] += matrixA[row][k] * matrixB[k][col];
+                            }
+                        }
+                    } catch (IndexOutOfBoundsException ignored) {
+                    }
+                }
+                return null;
+            });
+        }
+
+        executor.invokeAll(tasks);
+
+        return matrixC;
+    }
+
     public static int[][] concurrentMultiplyStreams(int[][] matrixA, int[][] matrixB, int threadNumber)
             throws InterruptedException, ExecutionException {
 
