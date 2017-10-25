@@ -11,6 +11,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/*
+# Run complete. Total time: 00:10:21
+
+Benchmark                                  (threadNumber)  Mode  Cnt    Score    Error  Units
+MatrixBenchmark.concurrentMultiply2                     3    ss  100  324,787 ?  8,682  ms/op
+MatrixBenchmark.concurrentMultiply2                     4    ss  100  299,190 ? 20,809  ms/op
+MatrixBenchmark.concurrentMultiply2                    10    ss  100  298,859 ? 12,887  ms/op
+MatrixBenchmark.concurrentMultiplyMaxple                3    ss  100  477,705 ?  6,604  ms/op
+MatrixBenchmark.concurrentMultiplyMaxple                4    ss  100  350,472 ?  4,765  ms/op
+MatrixBenchmark.concurrentMultiplyMaxple               10    ss  100  249,847 ?  7,254  ms/op
+MatrixBenchmark.concurrentMultiplyStreams               3    ss  100  341,904 ? 10,199  ms/op
+MatrixBenchmark.concurrentMultiplyStreams               4    ss  100  278,431 ?  5,094  ms/op
+MatrixBenchmark.concurrentMultiplyStreams              10    ss  100  284,124 ?  5,026  ms/op
+ */
+
 @Warmup(iterations = 10)
 @Measurement(iterations = 10)
 @BenchmarkMode({Mode.SingleShotTime})
@@ -71,6 +86,11 @@ public class MatrixBenchmark {
     @Benchmark
     public int[][] concurrentMultiply2() throws Exception {
         return MatrixUtil.concurrentMultiply2(matrixA, matrixB, executor);
+    }
+
+    @Benchmark
+    public int[][] concurrentMultiplyMaxple() throws Exception {
+        return MatrixUtil.concurrentMultiplyMaxple(matrixA, matrixB, executor, threadNumber);
     }
 
     @Setup
