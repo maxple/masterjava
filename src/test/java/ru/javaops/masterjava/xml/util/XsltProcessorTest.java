@@ -15,4 +15,17 @@ public class XsltProcessorTest {
             System.out.println(processor.transform(xmlInputStream));
         }
     }
+
+    @Test
+    public void transformGroups() throws Exception {
+        try (InputStream xslInputStream = Resources.getResource("groups.xsl").openStream();
+             InputStream xmlInputStream = Resources.getResource("payload.xml").openStream()) {
+
+            XsltProcessor processor = new XsltProcessor(xslInputStream);
+
+            processor.setParameter("projectId", "masterjava");
+
+            System.out.println(processor.transform(xmlInputStream));
+        }
+    }
 }

@@ -23,6 +23,10 @@ public class XsltProcessor {
         }
     }
 
+    public void setParameter(String name, Object value) {
+        xformer.setParameter(name, value);
+    }
+
     public String transform(InputStream xmlInputStream) throws TransformerException {
         StringWriter out = new StringWriter();
         transform(xmlInputStream, out);
