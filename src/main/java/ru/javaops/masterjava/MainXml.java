@@ -56,8 +56,7 @@ public class MainXml {
         Set<User> userSet = new TreeSet<>();
 
         for (User user : payload.getUsers().getUser()) {
-            user.getGroupId().retainAll(groupIds);
-            if (user.getGroupId().size() > 0) {
+            if (!Collections.disjoint(user.getGroupId(), groupIds)) {
                 userSet.add(user);
             }
         }
@@ -100,14 +99,14 @@ public class MainXml {
                         groupIds.add(processor.getAttribute("id"));
                     }
                 }
+                break;
             }
         }
 
         Set<User> userSet = new TreeSet<>();
 
         for (User user : users) {
-            user.getGroupId().retainAll(groupIds);
-            if (user.getGroupId().size() > 0) {
+            if (!Collections.disjoint(user.getGroupId(), groupIds)) {
                 userSet.add(user);
             }
         }
