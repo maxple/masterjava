@@ -12,8 +12,8 @@ import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/upload")
-@MultipartConfig(location = "D:/tmp")
+@WebServlet("/")
+@MultipartConfig
 public class FileUploadServlet extends HttpServlet {
 
     @Override
@@ -23,17 +23,14 @@ public class FileUploadServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String fileName = "";
         for (Part part : request.getParts()) {
-            fileName = part.getSubmittedFileName();
-            part.write(fileName);
+            PrintWriter out = response.getWriter();
+            try {
+                out.print(Util.getUsersHtml(part.getInputStream()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             break;
-        }
-        PrintWriter out = response.getWriter();
-        try {
-            out.print(Util.getUsersHtml("D:/tmp/" + fileName));
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }

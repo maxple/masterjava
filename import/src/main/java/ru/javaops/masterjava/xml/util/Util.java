@@ -4,7 +4,6 @@ import j2html.tags.ContainerTag;
 import ru.javaops.masterjava.xml.schema.User;
 
 import javax.xml.stream.events.XMLEvent;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Comparator;
 import java.util.Set;
@@ -14,16 +13,17 @@ import static j2html.TagCreator.*;
 
 public class Util {
 
-    public static String getUsersHtml(String path) throws Exception {
+    private static JaxbParser userParser = new JaxbParser(User.class);
 
-        try (InputStream is = new FileInputStream(path)) {
-            StaxStreamProcessor processor = new StaxStreamProcessor(is);
+    public static String getUsersHtml(InputStream inputStream) throws Exception {
+
+        try {
+            StaxStreamProcessor processor = new StaxStreamProcessor(inputStream);
 
             Set<User> users = new TreeSet<>(Comparator.comparing(User::getValue).thenComparing(User::getEmail));
 
-            JaxbParser parser = new JaxbParser(User.class);
             while (processor.doUntil(XMLEvent.START_ELEMENT, "User")) {
-                users.add(parser.unmarshal(processor.getReader(), User.class));
+                users.add(userParser.unmarshal(processor.getReader(), User.class));
             }
 
             final ContainerTag table = table().with(
@@ -38,6 +38,8 @@ public class Util {
                     head().with(title("Users")),
                     body().with(h1("Users"), table)
             ).render();
+        } finally {
+            inputStream.close();
         }
     }
 }

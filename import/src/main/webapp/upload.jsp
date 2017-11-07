@@ -5,7 +5,7 @@
     <title>File Upload</title>
 </head>
 <body>
-<form action="${pageContext.request.contextPath}/upload"
+<form action="upload"
       enctype="multipart/form-data"
       method="post">
     <p>
