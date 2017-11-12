@@ -1,6 +1,8 @@
 package ru.javaops.masterjava.upload;
 
 import org.thymeleaf.context.WebContext;
+import ru.javaops.masterjava.persist.DBIProvider;
+import ru.javaops.masterjava.persist.dao.UserDao;
 import ru.javaops.masterjava.persist.model.User;
 
 import javax.servlet.ServletException;
@@ -19,6 +21,8 @@ import static ru.javaops.masterjava.common.web.ThymeleafListener.engine;
 @WebServlet(urlPatterns = "/", loadOnStartup = 1)
 @MultipartConfig
 public class UploadServlet extends HttpServlet {
+
+    private final UserDao userDao = DBIProvider.getDao(UserDao.class);
 
     private final UserProcessor userProcessor = new UserProcessor();
 
@@ -40,6 +44,9 @@ public class UploadServlet extends HttpServlet {
             }
             try (InputStream is = filePart.getInputStream()) {
                 List<User> users = userProcessor.process(is);
+
+                userDao.batchInsertGeneratedId(users, Integer.parseInt(req.getParameter("pageSize")));
+
                 webContext.setVariable("users", users);
                 engine.process("result", webContext, resp.getWriter());
             }
