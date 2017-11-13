@@ -23,5 +23,21 @@
     </tr>
     </tbody>
 </table>
+<table th:if="${errorMessages.size() > 0}"
+       border="1"
+       cellpadding="8"
+       cellspacing="0">
+    <thead>
+    <tr>
+        <th>Errors</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!--/*@thymesVar id="errorMessages" type="java.lang.String"*/-->
+    <tr th:each="errorMessage : ${errorMessages}">
+        <td th:text="${errorMessage}"></td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>

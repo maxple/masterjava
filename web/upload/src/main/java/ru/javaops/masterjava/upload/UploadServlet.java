@@ -1,8 +1,6 @@
 package ru.javaops.masterjava.upload;
 
 import org.thymeleaf.context.WebContext;
-import ru.javaops.masterjava.persist.DBIProvider;
-import ru.javaops.masterjava.persist.dao.UserDao;
 import ru.javaops.masterjava.persist.model.User;
 
 import javax.servlet.ServletException;
@@ -14,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import static ru.javaops.masterjava.common.web.ThymeleafListener.engine;
@@ -21,8 +20,6 @@ import static ru.javaops.masterjava.common.web.ThymeleafListener.engine;
 @WebServlet(urlPatterns = "/", loadOnStartup = 1)
 @MultipartConfig
 public class UploadServlet extends HttpServlet {
-
-    private final UserDao userDao = DBIProvider.getDao(UserDao.class);
 
     private final UserProcessor userProcessor = new UserProcessor();
 
@@ -43,11 +40,11 @@ public class UploadServlet extends HttpServlet {
                 throw new IllegalStateException("Upload file have not been selected");
             }
             try (InputStream is = filePart.getInputStream()) {
-                List<User> users = userProcessor.process(is);
-
-                userDao.batchInsertGeneratedId(users, Integer.parseInt(req.getParameter("pageSize")));
-
+                final int pageSize = Integer.parseInt(req.getParameter("pageSize"));
+                List<String> errorMessages = new ArrayList<>();
+                final List<User> users = userProcessor.process(is, pageSize, errorMessages);
                 webContext.setVariable("users", users);
+                webContext.setVariable("errorMessages", errorMessages);
                 engine.process("result", webContext, resp.getWriter());
             }
         } catch (Exception e) {
