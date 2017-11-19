@@ -1,14 +1,14 @@
 package ru.javaops.masterjava.upload;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.dao.UserDao;
 import ru.javaops.masterjava.persist.model.User;
 import ru.javaops.masterjava.persist.model.UserFlag;
 import ru.javaops.masterjava.xml.schema.ObjectFactory;
 import ru.javaops.masterjava.xml.util.JaxbParser;
-import ru.javaops.masterjava.xml.util.JaxbUnmarshaller;
 import ru.javaops.masterjava.xml.util.StaxStreamProcessor;
 
 import javax.xml.bind.JAXBException;
@@ -24,8 +24,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+@Slf4j
 public class UserProcessor {
-    private static final Logger log = LoggerFactory.getLogger(UserProcessor.class);
     private static final int NUMBER_THREADS = 4;
 
     private static final JaxbParser jaxbParser = new JaxbParser(ObjectFactory.class);
@@ -33,14 +33,10 @@ public class UserProcessor {
 
     private ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_THREADS);
 
+    @AllArgsConstructor
     public static class FailedEmails {
         public String emailsOrRange;
         public String reason;
-
-        public FailedEmails(String emailsOrRange, String reason) {
-            this.emailsOrRange = emailsOrRange;
-            this.reason = reason;
-        }
 
         @Override
         public String toString() {
@@ -57,8 +53,8 @@ public class UserProcessor {
         Map<String, Future<List<String>>> chunkFutures = new LinkedHashMap<>();  // ordered map (emailRange -> chunk future)
 
         List<User> chunk = new ArrayList<>(chunkSize);
-        final StaxStreamProcessor processor = new StaxStreamProcessor(is);
-        JaxbUnmarshaller unmarshaller = jaxbParser.createUnmarshaller();
+        val processor = new StaxStreamProcessor(is);
+        val unmarshaller = jaxbParser.createUnmarshaller();
 
         while (processor.doUntil(XMLEvent.START_ELEMENT, "User")) {
             ru.javaops.masterjava.xml.schema.User xmlUser = unmarshaller.unmarshal(processor.getReader(), ru.javaops.masterjava.xml.schema.User.class);
