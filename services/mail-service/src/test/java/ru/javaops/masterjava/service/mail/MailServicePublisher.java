@@ -9,6 +9,8 @@ import javax.xml.ws.Endpoint;
 public class MailServicePublisher {
 
     public static void main(String[] args) {
+        System.out.println("publish");
         Endpoint.publish("http://localhost:8080/mail/mailService", new MailServiceImpl());
+        System.out.println("published");
     }
 }

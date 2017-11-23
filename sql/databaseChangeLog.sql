@@ -32,3 +32,17 @@ CREATE TABLE user_group (
   group_id INTEGER NOT NULL REFERENCES groups (id),
   CONSTRAINT users_group_idx UNIQUE (user_id, group_id)
 );
+
+--changeset maxple:3
+create type mail_state_type as enum ('SENDING', 'SENT', 'NOT_SENT');
+
+create table mail_results (
+  id            integer primary key default nextval('common_seq'),
+  from_email    text            not null,
+  to_emails     text            not null,
+  cc_emails     text            not null,
+  subject       text            not null,
+  body          text            not null,
+  state         mail_state_type not null,
+  state_message text
+);
