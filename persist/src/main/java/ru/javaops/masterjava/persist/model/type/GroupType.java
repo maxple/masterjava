@@ -4,4 +4,8 @@ public enum GroupType {
     REGISTERING,
     CURRENT,
     FINISHED;
+
+    public static GroupType fromValue(String v) {
+        return valueOf(v);
+    }
 }
