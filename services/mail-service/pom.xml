@@ -27,6 +27,13 @@
             <artifactId>persist</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>persist</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>test-jar</type>
+            <!--<scope>test</scope>-->
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-email -->
         <dependency>

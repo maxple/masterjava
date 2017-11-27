@@ -10,44 +10,48 @@ import org.apache.commons.mail.Email;
 import org.apache.commons.mail.SimpleEmail;
 import ru.javaops.masterjava.config.Configs;
 import ru.javaops.masterjava.persist.DBIProvider;
+import ru.javaops.masterjava.persist.DBITestProvider;
 import ru.javaops.masterjava.persist.dao.MailResultDao;
 import ru.javaops.masterjava.persist.model.MailResult;
 import ru.javaops.masterjava.persist.model.type.MailState;
 
-import java.sql.DriverManager;
+import javax.mail.Authenticator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 @Slf4j
 public class MailSender {
-    private static final MailResultDao mailResultDao;
-
     static {
-        Config db = Configs.getConfig("persist.conf", "db");
+        Config mailConfig = Configs.getConfig("mail.conf", "mail");
 
-        DBIProvider.init(() -> {
-            try {
-                Class.forName("org.postgresql.Driver");
-            } catch (ClassNotFoundException e) {
-                throw new IllegalStateException("PostgreSQL driver not found", e);
-            }
-            return DriverManager.getConnection(db.getString("url"), db.getString("user"), db.getString("password"));
-        });
+        host = mailConfig.getString("host");
+        port = mailConfig.getInt("port");
+        username = mailConfig.getString("username");
+        authenticator = new DefaultAuthenticator(mailConfig.getString("username"), mailConfig.getString("password"));
+        useSSL = mailConfig.getBoolean("useSSL");
+        useTLS = mailConfig.getBoolean("useTLS");
+        debug = mailConfig.getBoolean("debug");
 
-        mailResultDao = DBIProvider.getDao(MailResultDao.class);
+        DBITestProvider.initDBI();
     }
+
+    private static String host;
+    private static int port;
+    private static String username;
+    private static Authenticator authenticator;
+    private static boolean useSSL;
+    private static boolean useTLS;
+    private static boolean debug;
+
+    private static final MailResultDao mailResultDao = DBIProvider.getDao(MailResultDao.class);
 
     static void sendMail(List<Addressee> to, List<Addressee> cc, String subject, String body) {
         log.info("Send mail to \'" + to + "\' cc \'" + cc + "\' subject \'" + subject + (log.isDebugEnabled() ? "\nbody=" + body : ""));
 
-        Config mailConfig = Configs.getConfig("mail.conf", "mail");
-
-        final String from = mailConfig.getString("username");
-
         MailResult mailResult = new MailResult();
 
-        mailResult.setFromEmail(from);
+        mailResult.setFromEmail(username);
 
         final Iterable<String> toEmails = toEmails(to);
         final Iterable<String> ccEmails = toEmails(cc);
@@ -61,19 +65,17 @@ public class MailSender {
         try {
             Email email = new SimpleEmail();
 
-            final String host = mailConfig.getString("host");
-
             email.setHostName(host);
-            email.setSmtpPort(mailConfig.getInt("port"));
+            email.setSmtpPort(port);
 
-            email.setAuthenticator(new DefaultAuthenticator(from, mailConfig.getString("password")));
+            email.setAuthenticator(authenticator);
 
-            email.setSSLOnConnect(mailConfig.getBoolean("useSSL"));
-            email.setStartTLSEnabled(mailConfig.getBoolean("useTLS"));
+            email.setSSLOnConnect(useSSL);
+            email.setStartTLSEnabled(useTLS);
 
-            email.setDebug(mailConfig.getBoolean("debug"));
+            email.setDebug(debug);
 
-            email.setFrom(from);
+            email.setFrom(username);
             email.setSubject(subject);
             email.setMsg(body);
 
