@@ -16,6 +16,18 @@
     <packaging>war</packaging>
     <name>Mail Service</name>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>${masterjava.config}/wsdl</directory>
+                <targetPath>${project.build.directory}/${build.finalName}/WEB-INF/wsdl/</targetPath>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
