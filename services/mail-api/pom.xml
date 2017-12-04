@@ -16,17 +16,17 @@
     <name>Mail API</name>
 
     <build>
-        <testResources>
-            <testResource>
+        <resources>
+            <resource>
                 <directory>${masterjava.config}</directory>
                 <includes>
                     <include>wsdl/mailService.wsdl</include>
                 </includes>
-            </testResource>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
     </build>
 
     <dependencies>
